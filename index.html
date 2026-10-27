@@ -3,181 +3,424 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Rainbow Pomodoro</title>
+
 <style>
 :root {
-  --blue:#a8d9fa;
-  --pale:#eaf1fa;
-  --lime:#c9d638;
-  --orange:#ff7920;
-  --pink:#f8a7b7;
-  --black:#000;
+  --blue: #a8d9fa;
+  --pale: #eaf1fa;
+  --lime: #c9d638;
+  --orange: #ff7920;
+  --pink: #f8a7b7;
+  --black: #000;
 }
-* { box-sizing:border-box }
-body { margin:0; padding:8px; font-family:Arial,Helvetica,sans-serif }
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 4px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
 .widget {
-  position:relative; isolation:isolate; overflow:hidden;
-  width:100%; max-width:650px; min-width:260px;
-  aspect-ratio:.68; margin:auto;
-  border:7px solid var(--blue); border-radius:38px;
-  background:var(--pale); padding:16% 5% 12%;
-  display:flex; flex-direction:column; align-items:center;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  width: 100%;
+  max-width: 650px;
+  min-width: 260px;
+  aspect-ratio: 0.68;
+  margin: auto;
+  border: 7px solid var(--blue);
+  border-radius: 38px;
+  background: var(--pale);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 27% 5% 8%;
 }
-.decor { position:absolute; inset:0; width:100%; height:100%; z-index:-1; pointer-events:none }
-.modes,.controls { display:flex; justify-content:center; gap:10px; width:100%; z-index:1 }
+
+/* Rainbow artwork */
+.decor {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.decor path {
+  fill: none;
+  stroke-linecap: butt;
+  stroke-linejoin: round;
+}
+
+/* Each colored band is 22 units thick.
+   The pale background separates the bands. */
+.rainbow-top {
+  stroke-width: 22;
+}
+
+.rainbow-bottom {
+  stroke-width: 22;
+}
+
+/* Mode buttons */
+.modes {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  z-index: 1;
+}
+
 button {
-  font-family:Arial,Helvetica,sans-serif; font-weight:800;
-  text-transform:uppercase; color:#000; cursor:pointer;
-  border:4px solid #000; border-radius:17px;
-  box-shadow:0 2px 0 #000; min-width:0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--black);
+  cursor: pointer;
+  border: 4px solid var(--black);
+  border-radius: 17px;
+  box-shadow: 0 2px 0 var(--black);
+  min-width: 0;
 }
-.mode { flex:1; padding:12px 4px; font-size:clamp(11px,2.7vw,18px) }
-.short { background:var(--lime) }
-.long { background:var(--orange) }
-.break { background:var(--pink) }
-.mode[aria-pressed="true"] { outline:3px solid white; outline-offset:-7px }
-.clock { position:relative; width:min(76%,390px); aspect-ratio:1; margin:auto 0; display:grid; place-items:center }
-.clock svg { width:100%; height:100% }
-.track,.progress { fill:none; stroke-width:8 }
-.track { stroke:#f0f2c8 }
-.progress { stroke:var(--lime); stroke-linecap:butt; transform:rotate(-90deg); transform-origin:50% 50% }
-.time { position:absolute; font-size:clamp(36px,9.5vw,76px); color:#000; font-weight:400; font-variant-numeric:tabular-nums; white-space:nowrap }
-.control { padding:13px 5px; font-size:clamp(11px,2.8vw,19px) }
-.start { background:#fde8eb; flex:1.6 }
-.reset { background:#ffd7c4; flex:1 }
-.status { margin-top:10px; font-size:11px; color:#668db9; text-align:center; z-index:1 }
-@media(max-width:380px) {
- .widget { border-width:6px; border-radius:28px }
- button { border-width:3px; border-radius:12px }
- .modes,.controls { gap:6px }
+
+.mode {
+  flex: 1;
+  padding: 14px 4px;
+  font-size: clamp(15px, 3.5vw, 23px);
+}
+
+.short { background: var(--lime); }
+.long { background: var(--orange); }
+.break { background: var(--pink); }
+
+.mode[aria-pressed="true"] {
+  outline: 3px solid white;
+  outline-offset: -7px;
+}
+
+/* Instruction text */
+.status {
+  position: relative;
+  z-index: 1;
+  margin-top: 16px;
+  font-size: clamp(15px, 3vw, 19px);
+  line-height: 1.3;
+  color: var(--black);
+  text-align: center;
+}
+
+/* Timer ring */
+.clock {
+  position: relative;
+  width: min(76%, 390px);
+  aspect-ratio: 1;
+  margin: auto;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.clock svg {
+  width: 100%;
+  height: 100%;
+}
+
+.track,
+.progress {
+  fill: none;
+  stroke-width: 8;
+}
+
+.track {
+  stroke: #f0f2c8;
+}
+
+.progress {
+  stroke: var(--lime);
+  stroke-linecap: butt;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+.time {
+  position: absolute;
+  font-size: clamp(36px, 9.5vw, 76px);
+  color: var(--black);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Bottom controls */
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  z-index: 1;
+  margin-top: auto;
+}
+
+.control {
+  padding: 13px 5px;
+  font-size: clamp(13px, 3vw, 20px);
+}
+
+.start {
+  background: #fde8eb;
+  flex: 1.6;
+}
+
+.reset {
+  background: #ffd7c4;
+  flex: 1;
+}
+
+@media (max-width: 380px) {
+  .widget {
+    border-width: 6px;
+    border-radius: 28px;
+  }
+
+  button {
+    border-width: 3px;
+    border-radius: 12px;
+  }
+
+  .modes,
+  .controls {
+    gap: 6px;
+  }
 }
 </style>
 </head>
+
 <body>
 <div class="widget">
 
-<svg class="decor" viewBox="0 0 600 880" preserveAspectRatio="none" aria-hidden="true">
+<svg class="decor" viewBox="0 0 600 880"
+     preserveAspectRatio="none" aria-hidden="true">
   <defs>
     <clipPath id="frame">
       <rect width="600" height="880" rx="25"/>
     </clipPath>
   </defs>
-  <g clip-path="url(#frame)" fill="none"
-     stroke-linecap="butt" stroke-linejoin="round">
 
-    <!-- Upper-right rainbow: smooth concentric bands -->
-    <g stroke-width="22">
-      <path d="M 380,-55 C 435,-45 450,20 500,42 C 535,58 575,58 630,50"
-            stroke="#a8d9fa" stroke-width="154"/>
-      <path d="M 380,-55 C 435,-45 450,20 500,42 C 535,58 575,58 630,50"
-            stroke="#eaf1fa" stroke-width="132"/>
-      <path d="M 380,-55 C 435,-45 450,20 500,42 C 535,58 575,58 630,50"
-            stroke="#f8a7b7" stroke-width="110"/>
-      <path d="M 380,-55 C 435,-45 450,20 500,42 C 535,58 575,58 630,50"
-            stroke="#eaf1fa" stroke-width="88"/>
-      <path d="M 380,-55 C 435,-45 450,20 500,42 C 535,58 575,58 630,50"
-            stroke="#c9d638" stroke-width="66"/>
-      <path d="M 380,-55 C 435,-45 450,20 500,42 C 535,58 575,58 630,50"
-            stroke="#eaf1fa" stroke-width="44"/>
-      <path d="M 380,-55 C 435,-45 450,20 500,42 C 535,58 575,58 630,50"
-            stroke="#ff7920" stroke-width="22"/>
+  <g clip-path="url(#frame)">
+
+    <!-- Upper-right rainbow: four equal colored bands -->
+    <g class="rainbow-top">
+      <path d="M 600,-105
+               C 500,-105 500,-25 445,-5
+               C 390,15 405,65 455,88
+               C 500,108 555,112 640,112"
+            stroke="#a8d9fa" transform="translate(0,-36)"/>
+      <path d="M 600,-105
+               C 500,-105 500,-25 445,-5
+               C 390,15 405,65 455,88
+               C 500,108 555,112 640,112"
+            stroke="#f8a7b7" transform="translate(0,-12)"/>
+      <path d="M 600,-105
+               C 500,-105 500,-25 445,-5
+               C 390,15 405,65 455,88
+               C 500,108 555,112 640,112"
+            stroke="#c9d638" transform="translate(0,12)"/>
+      <path d="M 600,-105
+               C 500,-105 500,-25 445,-5
+               C 390,15 405,65 455,88
+               C 500,108 555,112 640,112"
+            stroke="#ff7920" transform="translate(0,36)"/>
     </g>
 
-    <!-- Lower rainbow: long horizontal sweep and soft bends -->
-    <g stroke-linecap="butt" stroke-linejoin="round">
-      <path d="M -80,650 C 20,620 70,650 110,700 S 200,780 300,735 S 450,700 520,760 S 610,810 680,790"
-            stroke="#b9d7ec" stroke-width="154"/>
-      <path d="M -80,650 C 20,620 70,650 110,700 S 200,780 300,735 S 450,700 520,760 S 610,810 680,790"
-            stroke="#eaf1fa" stroke-width="132"/>
-      <path d="M -80,650 C 20,620 70,650 110,700 S 200,780 300,735 S 450,700 520,760 S 610,810 680,790"
-            stroke="#f8a7b7" stroke-width="110"/>
-      <path d="M -80,650 C 20,620 70,650 110,700 S 200,780 300,735 S 450,700 520,760 S 610,810 680,790"
-            stroke="#eaf1fa" stroke-width="88"/>
-      <path d="M -80,650 C 20,620 70,650 110,700 S 200,780 300,735 S 450,700 520,760 S 610,810 680,790"
-            stroke="#c9d638" stroke-width="66"/>
-      <path d="M -80,650 C 20,620 70,650 110,700 S 200,780 300,735 S 450,700 520,760 S 610,810 680,790"
-            stroke="#eaf1fa" stroke-width="44"/>
-      <path d="M -80,650 C 20,620 70,650 110,700 S 200,780 300,735 S 450,700 520,760 S 610,810 680,790"
-            stroke="#ff7920" stroke-width="22"/>
+    <!-- Lower-left rainbow: smooth parallel sweep -->
+    <g class="rainbow-bottom">
+      <path d="M -90,640
+               C 20,640 55,665 100,715
+               C 145,765 190,780 255,755
+               C 320,730 370,690 430,710
+               C 490,730 535,790 650,810"
+            stroke="#a8d9fa" transform="translate(0,-36)"/>
+      <path d="M -90,640
+               C 20,640 55,665 100,715
+               C 145,765 190,780 255,755
+               C 320,730 370,690 430,710
+               C 490,730 535,790 650,810"
+            stroke="#f8a7b7" transform="translate(0,-12)"/>
+      <path d="M -90,640
+               C 20,640 55,665 100,715
+               C 145,765 190,780 255,755
+               C 320,730 370,690 430,710
+               C 490,730 535,790 650,810"
+            stroke="#c9d638" transform="translate(0,12)"/>
+      <path d="M -90,640
+               C 20,640 55,665 100,715
+               C 145,765 190,780 255,755
+               C 320,730 370,690 430,710
+               C 490,730 535,790 650,810"
+            stroke="#ff7920" transform="translate(0,36)"/>
     </g>
+
   </g>
 </svg>
 
-
 <div class="modes">
-<button class="mode short" data-mode="short" aria-pressed="false">Short</button>
-<button class="mode long" data-mode="long" aria-pressed="false">Long</button>
-<button class="mode break" data-mode="break" aria-pressed="false">Break</button>
+  <button class="mode short" data-mode="short" aria-pressed="false">Short</button>
+  <button class="mode long" data-mode="long" aria-pressed="false">Long</button>
+  <button class="mode break" data-mode="break" aria-pressed="false">Break</button>
 </div>
 
+<div class="status" id="status">One thing at a time.</div>
+
 <div class="clock">
-<svg viewBox="0 0 100 100" aria-hidden="true">
-<circle class="track" cx="50" cy="50" r="44"/>
-<circle class="progress" id="progress" cx="50" cy="50" r="44" stroke-dasharray="276.46" stroke-dashoffset="0"/>
-</svg>
-<div class="time" id="time">25:00</div>
+  <svg viewBox="0 0 100 100" aria-hidden="true">
+    <circle class="track" cx="50" cy="50" r="44"/>
+    <circle class="progress" id="progress"
+            cx="50" cy="50" r="44"
+            stroke-dasharray="276.46"
+            stroke-dashoffset="0"/>
+  </svg>
+  <div class="time" id="time">25:00</div>
 </div>
 
 <div class="controls">
-<button class="control start" id="start">Start / Pause</button>
-<button class="control reset" id="reset">Reset</button>
+  <button class="control start" id="start">Start / Pause</button>
+  <button class="control reset" id="reset">Reset</button>
 </div>
-<div class="status" id="status">One thing at a time.</div>
+
 </div>
+
 <script>
-const durations={short:25*60,long:50*60,break:5*60};
-const colors={short:'#c9d638',long:'#ff7920',break:'#f8a7b7'};
-const circumference=2*Math.PI*44;
-const timeEl=document.getElementById('time');
-const progress=document.getElementById('progress');
-const statusEl=document.getElementById('status');
-const startBtn=document.getElementById('start');
-const modeBtns=[...document.querySelectorAll('[data-mode]')];
-let mode='short',remaining=durations.short,running=false,endAt=null,timerId=null;
-function render(){
- const m=Math.floor(remaining/60),s=remaining%60;
- timeEl.textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
- progress.style.strokeDasharray=circumference;
- progress.style.strokeDashoffset=circumference*(1-remaining/durations[mode]);
- progress.style.stroke=colors[mode];
- document.title=timeEl.textContent+' — Rainbow Pomodoro';
+const durations = {
+  short: 25 * 60,
+  long: 50 * 60,
+  break: 5 * 60
+};
+
+const colors = {
+  short: '#c9d638',
+  long: '#ff7920',
+  break: '#f8a7b7'
+};
+
+const circumference = 2 * Math.PI * 44;
+const timeEl = document.getElementById('time');
+const progress = document.getElementById('progress');
+const statusEl = document.getElementById('status');
+const startBtn = document.getElementById('start');
+const modeBtns = [...document.querySelectorAll('[data-mode]')];
+
+let mode = 'short';
+let remaining = durations.short;
+let running = false;
+let endAt = null;
+let timerId = null;
+
+function render() {
+  const minutes = Math.floor(remaining / 60);
+  const seconds = remaining % 60;
+
+  timeEl.textContent =
+    String(minutes).padStart(2, '0') + ':' +
+    String(seconds).padStart(2, '0');
+
+  progress.style.strokeDasharray = circumference;
+  progress.style.strokeDashoffset =
+    circumference * (1 - remaining / durations[mode]);
+
+  progress.style.stroke = colors[mode];
+  document.title = timeEl.textContent + ' — Rainbow Pomodoro';
 }
-function stop(){
- running=false;endAt=null;
- if(timerId)clearInterval(timerId);
- timerId=null;startBtn.textContent='Start / Pause';
+
+function stop() {
+  running = false;
+  endAt = null;
+
+  if (timerId) clearInterval(timerId);
+  timerId = null;
+  startBtn.textContent = 'Start / Pause';
 }
-function tick(){
- remaining=Math.max(0,Math.ceil((endAt-Date.now())/1000));render();
- if(remaining<=0){
-  stop();statusEl.textContent='Session complete! ✦ Take a breath.';
-  try{if('Notification'in window&&Notification.permission==='granted')new Notification('Rainbow Pomodoro',{body:'Your session is complete!'})}catch(e){}
- }
+
+function tick() {
+  remaining = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
+  render();
+
+  if (remaining <= 0) {
+    stop();
+    statusEl.textContent = 'Session complete! ✦ Take a breath.';
+
+    try {
+      if ('Notification' in window &&
+          Notification.permission === 'granted') {
+        new Notification('Rainbow Pomodoro', {
+          body: 'Your session is complete!'
+        });
+      }
+    } catch (e) {}
+  }
 }
-function selectMode(next){
- stop();mode=next;remaining=durations[mode];
- modeBtns.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===mode)));
- statusEl.textContent=mode==='break'?'A little time to recharge.':mode==='long'?'Settle in for a long focus session.':'One thing at a time.';
- render();
+
+function selectMode(nextMode) {
+  stop();
+  mode = nextMode;
+  remaining = durations[mode];
+
+  modeBtns.forEach(button => {
+    button.setAttribute(
+      'aria-pressed',
+      String(button.dataset.mode === mode)
+    );
+  });
+
+  statusEl.textContent =
+    mode === 'break' ? 'A little time to recharge.' :
+    mode === 'long' ? 'Settle in for a long focus session.' :
+    'One thing at a time.';
+
+  render();
 }
-startBtn.addEventListener('click',()=>{
- if(running){
-  remaining=Math.max(0,Math.ceil((endAt-Date.now())/1000));stop();
-  statusEl.textContent='Paused. Resume when ready.';render();
- }else{
-  if(remaining<=0)remaining=durations[mode];
-  running=true;endAt=Date.now()+remaining*1000;
-  startBtn.textContent='Pause';
-  statusEl.textContent=mode==='break'?'Enjoy your break.':'You’re in focus mode.';
-  if(timerId)clearInterval(timerId);
-  timerId=setInterval(tick,250);render();
- }
+
+startBtn.addEventListener('click', () => {
+  if (running) {
+    remaining = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
+    stop();
+    statusEl.textContent = 'Paused. Resume when ready.';
+    render();
+  } else {
+    if (remaining <= 0) remaining = durations[mode];
+
+    running = true;
+    endAt = Date.now() + remaining * 1000;
+    startBtn.textContent = 'Pause';
+
+    statusEl.textContent =
+      mode === 'break' ? 'Enjoy your break.' :
+      'You’re in focus mode.';
+
+    if (timerId) clearInterval(timerId);
+    timerId = setInterval(tick, 250);
+    render();
+  }
 });
-document.getElementById('reset').addEventListener('click',()=>{
- stop();remaining=durations[mode];statusEl.textContent='Timer reset.';render();
+
+document.getElementById('reset').addEventListener('click', () => {
+  stop();
+  remaining = durations[mode];
+  statusEl.textContent = 'Timer reset.';
+  render();
 });
-modeBtns.forEach(b=>b.addEventListener('click',()=>selectMode(b.dataset.mode)));
+
+modeBtns.forEach(button => {
+  button.addEventListener('click', () => selectMode(button.dataset.mode));
+});
+
 selectMode('short');
 </script>
 </body>

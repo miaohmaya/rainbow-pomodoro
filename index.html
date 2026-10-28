@@ -5,7 +5,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Rainbow Pomodoro</title>
-
 <style>
 :root {
   --blue: #a8d9fa;
@@ -16,9 +15,7 @@
   --black: #000;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -38,13 +35,9 @@ body {
   border: 7px solid var(--blue);
   border-radius: 38px;
   background: var(--pale);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 27% 5% 8%;
 }
 
-/* Rainbow artwork */
+/* Decorative artwork */
 .decor {
   position: absolute;
   inset: 0;
@@ -54,47 +47,41 @@ body {
   pointer-events: none;
 }
 
+/* Four equal-thickness colored bands */
 .decor path {
   fill: none;
+  stroke-width: 22;
   stroke-linecap: butt;
   stroke-linejoin: round;
 }
 
-/* Each colored band is 22 units thick.
-   The pale background separates the bands. */
-.rainbow-top {
-  stroke-width: 22;
-}
-
-.rainbow-bottom {
-  stroke-width: 22;
-}
-
 /* Mode buttons */
 .modes {
+  position: absolute;
+  top: 24%;
+  left: 7%;
+  width: 86%;
   display: flex;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  z-index: 1;
+  gap: 3%;
+  z-index: 2;
 }
 
 button {
   font-family: Arial, Helvetica, sans-serif;
   font-weight: 800;
   text-transform: uppercase;
-  color: var(--black);
+  color: #000;
   cursor: pointer;
-  border: 4px solid var(--black);
+  border: 4px solid #000;
   border-radius: 17px;
-  box-shadow: 0 2px 0 var(--black);
+  box-shadow: 0 2px 0 #000;
   min-width: 0;
 }
 
 .mode {
   flex: 1;
-  padding: 14px 4px;
-  font-size: clamp(15px, 3.5vw, 23px);
+  padding: 12px 2px;
+  font-size: clamp(14px, 3.2vw, 22px);
 }
 
 .short { background: var(--lime); }
@@ -106,42 +93,46 @@ button {
   outline-offset: -7px;
 }
 
-/* Instruction text */
+/* Instruction beneath the mode buttons */
 .status {
-  position: relative;
-  z-index: 1;
-  margin-top: 16px;
-  font-size: clamp(15px, 3vw, 19px);
-  line-height: 1.3;
-  color: var(--black);
+  position: absolute;
+  top: 34%;
+  left: 5%;
+  width: 90%;
+  margin: 0;
+  z-index: 2;
   text-align: center;
+  font-size: clamp(14px, 2.8vw, 19px);
+  line-height: 1.3;
+  color: #000;
 }
 
-/* Timer ring */
+/* Timer remains centered independently of other elements */
 .clock {
-  position: relative;
-  width: min(76%, 390px);
+  position: absolute;
+  left: 50%;
+  top: 53%;
+  transform: translate(-50%, -50%);
+  width: 48%;
+  max-width: 310px;
   aspect-ratio: 1;
-  margin: auto;
   display: grid;
   place-items: center;
-  flex-shrink: 0;
+  z-index: 1;
 }
 
 .clock svg {
+  display: block;
   width: 100%;
   height: 100%;
 }
 
-.track,
-.progress {
+.track, .progress {
   fill: none;
   stroke-width: 8;
 }
 
-.track {
-  stroke: #f0f2c8;
-}
+.track { stroke: #f0f2c8; }
 
 .progress {
   stroke: var(--lime);
@@ -153,35 +144,36 @@ button {
 .time {
   position: absolute;
   font-size: clamp(36px, 9.5vw, 76px);
-  color: var(--black);
+  color: #000;
   font-weight: 400;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
-/* Bottom controls */
+/* Controls anchored near the bottom */
 .controls {
+  position: absolute;
+  left: 7%;
+  bottom: 12%;
+  width: 86%;
   display: flex;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  z-index: 1;
-  margin-top: auto;
+  gap: 3%;
+  z-index: 2;
 }
 
 .control {
-  padding: 13px 5px;
-  font-size: clamp(13px, 3vw, 20px);
+  padding: 12px 3px;
+  font-size: clamp(12px, 2.8vw, 20px);
 }
 
 .start {
-  background: #fde8eb;
   flex: 1.6;
+  background: #fde8eb;
 }
 
 .reset {
-  background: #ffd7c4;
   flex: 1;
+  background: #ffd7c4;
 }
 
 @media (max-width: 380px) {
@@ -193,11 +185,6 @@ button {
   button {
     border-width: 3px;
     border-radius: 12px;
-  }
-
-  .modes,
-  .controls {
-    gap: 6px;
   }
 }
 </style>
@@ -216,58 +203,53 @@ button {
 
   <g clip-path="url(#frame)">
 
-    <!-- Upper-right rainbow: four equal colored bands -->
-    <g class="rainbow-top">
-      <path d="M 600,-105
-               C 500,-105 500,-25 445,-5
-               C 390,15 405,65 455,88
-               C 500,108 555,112 640,112"
+    <!-- Top-right rainbow corner -->
+    <g>
+      <path d="M 365,-75
+               C 430,-55 430,10 485,32
+               C 530,52 575,48 650,48"
             stroke="#a8d9fa" transform="translate(0,-36)"/>
-      <path d="M 600,-105
-               C 500,-105 500,-25 445,-5
-               C 390,15 405,65 455,88
-               C 500,108 555,112 640,112"
+      <path d="M 365,-75
+               C 430,-55 430,10 485,32
+               C 530,52 575,48 650,48"
             stroke="#f8a7b7" transform="translate(0,-12)"/>
-      <path d="M 600,-105
-               C 500,-105 500,-25 445,-5
-               C 390,15 405,65 455,88
-               C 500,108 555,112 640,112"
+      <path d="M 365,-75
+               C 430,-55 430,10 485,32
+               C 530,52 575,48 650,48"
             stroke="#c9d638" transform="translate(0,12)"/>
-      <path d="M 600,-105
-               C 500,-105 500,-25 445,-5
-               C 390,15 405,65 455,88
-               C 500,108 555,112 640,112"
+      <path d="M 365,-75
+               C 430,-55 430,10 485,32
+               C 530,52 575,48 650,48"
             stroke="#ff7920" transform="translate(0,36)"/>
     </g>
 
-    <!-- Lower-left rainbow: smooth parallel sweep -->
-    <g class="rainbow-bottom">
-      <path d="M -90,640
-               C 20,640 55,665 100,715
-               C 145,765 190,780 255,755
-               C 320,730 370,690 430,710
-               C 490,730 535,790 650,810"
+    <!-- Bottom flowing rainbow -->
+    <g>
+      <path d="M -100,650
+               C 5,620 55,660 100,710
+               C 145,760 190,775 250,750
+               C 310,725 365,685 425,710
+               C 485,735 535,785 650,815"
             stroke="#a8d9fa" transform="translate(0,-36)"/>
-      <path d="M -90,640
-               C 20,640 55,665 100,715
-               C 145,765 190,780 255,755
-               C 320,730 370,690 430,710
-               C 490,730 535,790 650,810"
+      <path d="M -100,650
+               C 5,620 55,660 100,710
+               C 145,760 190,775 250,750
+               C 310,725 365,685 425,710
+               C 485,735 535,785 650,815"
             stroke="#f8a7b7" transform="translate(0,-12)"/>
-      <path d="M -90,640
-               C 20,640 55,665 100,715
-               C 145,765 190,780 255,755
-               C 320,730 370,690 430,710
-               C 490,730 535,790 650,810"
+      <path d="M -100,650
+               C 5,620 55,660 100,710
+               C 145,760 190,775 250,750
+               C 310,725 365,685 425,710
+               C 485,735 535,785 650,815"
             stroke="#c9d638" transform="translate(0,12)"/>
-      <path d="M -90,640
-               C 20,640 55,665 100,715
-               C 145,765 190,780 255,755
-               C 320,730 370,690 430,710
-               C 490,730 535,790 650,810"
+      <path d="M -100,650
+               C 5,620 55,660 100,710
+               C 145,760 190,775 250,750
+               C 310,725 365,685 425,710
+               C 485,735 535,785 650,815"
             stroke="#ff7920" transform="translate(0,36)"/>
     </g>
-
   </g>
 </svg>
 
@@ -342,7 +324,6 @@ function render() {
 function stop() {
   running = false;
   endAt = null;
-
   if (timerId) clearInterval(timerId);
   timerId = null;
   startBtn.textContent = 'Start / Pause';
@@ -355,15 +336,6 @@ function tick() {
   if (remaining <= 0) {
     stop();
     statusEl.textContent = 'Session complete! ✦ Take a breath.';
-
-    try {
-      if ('Notification' in window &&
-          Notification.permission === 'granted') {
-        new Notification('Rainbow Pomodoro', {
-          body: 'Your session is complete!'
-        });
-      }
-    } catch (e) {}
   }
 }
 
@@ -399,10 +371,8 @@ startBtn.addEventListener('click', () => {
     running = true;
     endAt = Date.now() + remaining * 1000;
     startBtn.textContent = 'Pause';
-
     statusEl.textContent =
-      mode === 'break' ? 'Enjoy your break.' :
-      'You’re in focus mode.';
+      mode === 'break' ? 'Enjoy your break.' : 'You’re in focus mode.';
 
     if (timerId) clearInterval(timerId);
     timerId = setInterval(tick, 250);

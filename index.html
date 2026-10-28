@@ -13,6 +13,7 @@
   --lime: #c9d638;
   --orange: #ff7920;
   --pink: #f8a7b7;
+  --black: #000;
 }
 
 * {
@@ -34,8 +35,6 @@ body {
   min-width: 260px;
   aspect-ratio: 1366 / 2022;
   margin: auto;
-
-  /* Your exact Canva artwork */
   background-image: url("./Pomodoro%20Timer%20Mock-up%20(1).png");
   background-size: 100% 100%;
   background-position: center;
@@ -45,7 +44,7 @@ body {
 /* Mode buttons */
 .modes {
   position: absolute;
-  top: 24%;
+  top: 19%;
   left: 7%;
   width: 86%;
   display: flex;
@@ -58,11 +57,11 @@ button {
   font-family: Arial, Helvetica, sans-serif;
   font-weight: 800;
   text-transform: uppercase;
-  color: #000;
+  color: var(--black);
   cursor: pointer;
-  border: 4px solid #000;
+  border: 4px solid var(--black);
   border-radius: 17px;
-  box-shadow: 0 2px 0 #000;
+  box-shadow: 0 2px 0 var(--black);
   min-width: 0;
 }
 
@@ -81,28 +80,28 @@ button {
   outline-offset: -7px;
 }
 
-/* Instruction directly beneath the modes */
+/* Slogan in the upper-left corner */
 .status {
   position: absolute;
-  top: 33%;
-  left: 5%;
-  width: 90%;
+  top: 10%;
+  left: 10%;
+  width: 65%;
   margin: 0;
   z-index: 2;
-  text-align: center;
+  text-align: left;
   font-size: clamp(14px, 2.8vw, 19px);
   line-height: 1.3;
-  color: #000;
+  color: var(--black);
 }
 
-/* Centered timer ring */
+/* Enlarged countdown ring */
 .clock {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 54%;
   transform: translate(-50%, -50%);
-  width: 48%;
-  max-width: 310px;
+  width: 58%;
+  max-width: 370px;
   aspect-ratio: 1;
   display: grid;
   place-items: center;
@@ -116,26 +115,35 @@ button {
 }
 
 .track,
-.progress {
+.progress,
+.progress-outline {
   fill: none;
-  stroke-width: 8;
-}
-
-.track {
-  stroke: #f0f2c8;
-}
-
-.progress {
-  stroke: var(--lime);
   stroke-linecap: butt;
   transform: rotate(-90deg);
   transform-origin: 50% 50%;
 }
 
+.track {
+  stroke: #f0f2c8;
+  stroke-width: 8;
+}
+
+/* Black outline beneath the colored progress ring */
+.progress-outline {
+  stroke: var(--black);
+  stroke-width: 12;
+}
+
+/* Colored countdown ring */
+.progress {
+  stroke: var(--lime);
+  stroke-width: 8;
+}
+
 .time {
   position: absolute;
   font-size: clamp(36px, 9.5vw, 76px);
-  color: #000;
+  color: var(--black);
   font-weight: 400;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -193,11 +201,18 @@ button {
   <div class="clock">
     <svg viewBox="0 0 100 100" aria-hidden="true">
       <circle class="track" cx="50" cy="50" r="44"/>
+
+      <circle class="progress-outline" id="progressOutline"
+              cx="50" cy="50" r="44"
+              stroke-dasharray="276.46"
+              stroke-dashoffset="0"/>
+
       <circle class="progress" id="progress"
               cx="50" cy="50" r="44"
               stroke-dasharray="276.46"
               stroke-dashoffset="0"/>
     </svg>
+
     <div class="time" id="time">25:00</div>
   </div>
 
@@ -222,8 +237,10 @@ const colors = {
 };
 
 const circumference = 2 * Math.PI * 44;
+
 const timeEl = document.getElementById('time');
 const progress = document.getElementById('progress');
+const progressOutline = document.getElementById('progressOutline');
 const statusEl = document.getElementById('status');
 const startBtn = document.getElementById('start');
 const modeBtns = [...document.querySelectorAll('[data-mode]')];
@@ -242,11 +259,15 @@ function render() {
     String(minutes).padStart(2, '0') + ':' +
     String(seconds).padStart(2, '0');
 
-  progress.style.strokeDasharray = circumference;
-  progress.style.strokeDashoffset =
-    circumference * (1 - remaining / durations[mode]);
+  const offset = circumference * (1 - remaining / durations[mode]);
 
+  progress.style.strokeDasharray = circumference;
+  progress.style.strokeDashoffset = offset;
   progress.style.stroke = colors[mode];
+
+  progressOutline.style.strokeDasharray = circumference;
+  progressOutline.style.strokeDashoffset = offset;
+
   document.title = timeEl.textContent + ' — Rainbow Pomodoro';
 }
 
